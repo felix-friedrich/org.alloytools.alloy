@@ -1036,7 +1036,7 @@ public final class VizGUI implements ComponentListener {
             left = myCustomPanel;
         } else if (settingsOpen > 1) {
             if (myEvaluatorPanel == null)
-                myEvaluatorPanel = new OurConsole(evaluator, true, "The ", true, "Alloy Evaluator ", false, "allows you to type in Alloy expressions and see their values.\nFor example, ", true, "univ", false, " shows the list of all atoms.\nIf inspecting a trace, evaluation is performed on the currently focused state (left-hand side).\n(You can press UP and DOWN to recall old inputs).\n");
+                myEvaluatorPanel = new OurConsole(evaluator, true, fontSize, "The ", true, "Alloy Evaluator ", false, "allows you to type in Alloy expressions and see their values.\nFor example, ", true, "univ", false, " shows the list of all atoms.\nIf inspecting a trace, evaluation is performed on the currently focused state (left-hand side).\n(You can press UP and DOWN to recall old inputs).\n");
             try {
                 evaluator.compute(new File(xmlFileName));
                 // [electrum] evaluator acts on current state
@@ -1045,6 +1045,7 @@ public final class VizGUI implements ComponentListener {
             } // exception should not happen
             left = myEvaluatorPanel;
             left.setBorder(new OurBorder(false, false, false, false));
+            myEvaluatorPanel.doSetFontSize(fontSize);
         }
         if (frame != null && frame.getContentPane() == splitpane)
             lastDividerPosition = splitpane.getDividerLocation();
