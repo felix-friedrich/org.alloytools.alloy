@@ -80,20 +80,22 @@ public final class OurConsole extends JScrollPane {
     /** This ensures the class can be serialized reliably. */
     private static final long         serialVersionUID    = 0;
 
+    private static final int          defaultFontSize     = 14;
+
     /** The style for default text. */
-    private final static AttributeSet plain               = style("Verdana,Helvetica", 14, false, false, false, Color.BLACK, 0);
+    private final MutableAttributeSet plain               = style("Verdana,Helvetica", defaultFontSize, false, false, false, Color.BLACK, 0);
 
     /** The style for table text. */
-    private final static AttributeSet mono                = style("Input Mono,DejaVu Sans Mono,Courier New,Courier", 14, false, false, false, Color.BLACK, 10);
+    private final MutableAttributeSet mono                = style("Input Mono,DejaVu Sans Mono,Courier New,Courier", defaultFontSize, false, false, false, Color.BLACK, 10);
 
     /** The style for bold text. */
-    private final static AttributeSet bold                = style("Verdana,Helvetica", 14, true, false, false, Color.BLACK, 0);
+    private final MutableAttributeSet bold                = style("Verdana,Helvetica", defaultFontSize, true, false, false, Color.BLACK, 0);
 
     /** The style for successful result. */
-    private final static AttributeSet good                = style("Verdana,Helvetica", 14, false, false, false, Color.BLUE, 10);
+    private final MutableAttributeSet good                = style("Verdana,Helvetica", defaultFontSize, false, false, false, Color.BLUE, 10);
 
     /** The style for failed result. */
-    private final static AttributeSet bad                 = style("Verdana,Helvetica", 14, false, false, false, Color.RED, 10);
+    private final MutableAttributeSet bad                 = style("Verdana,Helvetica", defaultFontSize, false, false, false, Color.RED, 10);
 
     /**
      * The number of characters that currently exist above the horizontal divider
@@ -107,12 +109,12 @@ public final class OurConsole extends JScrollPane {
      * The main JTextPane containing 0 or more input/output pairs, followed by a
      * horizontal bar, followed by this.sub
      */
-    private final JTextPane           main                = do_makeTextPane(false, 5, 5, 5);
+    private final JTextPane           main;//                = do_makeTextPane(false, 5, 5, 5);
 
     /**
      * The sub JTextPane where the user can type in the next command.
      */
-    private final JTextPane           sub                 = do_makeTextPane(true, 10, 10, 0);
+    private final JTextPane           sub;//                 = do_makeTextPane(true, 10, 10, 0);
 
     /**
      * The history of all commands entered so far, plus an extra String representing
@@ -136,8 +138,6 @@ public final class OurConsole extends JScrollPane {
      * size, boldness, color, and left indentation.
      */
     static MutableAttributeSet style(String fontName, int fontSize, boolean boldness, boolean italic, boolean strike, Color color, int leftIndent) {
-
-
         fontName = AlloyGraphics.matchBestFontName(fontName);
 
         MutableAttributeSet s = new SimpleAttributeSet();
@@ -152,6 +152,18 @@ public final class OurConsole extends JScrollPane {
         return s;
     }
 
+
+    public void doSetFontSize(int fontSize) {
+        StyleConstants.setFontSize(plain, fontSize);
+        StyleConstants.setFontSize(mono, fontSize);
+        StyleConstants.setFontSize(bold, fontSize);
+        StyleConstants.setFontSize(good, fontSize);
+        StyleConstants.setFontSize(bad, fontSize);
+        main.setFont(new Font("Verdana", Font.PLAIN, fontSize));
+        sub.setFont(new Font("Verdana", Font.PLAIN, fontSize));
+        sub.setDocument(new OurSyntaxUndoableDocument("Verdana", fontSize));
+    }
+
     /**
      * Construct a JScrollPane that allows the user to interactively type in
      * commands and see replies.
@@ -163,10 +175,13 @@ public final class OurConsole extends JScrollPane {
      *            printed to the screen as is, and Boolean.TRUE will turn subsequent
      *            text bold, and Boolean.FALSE will turn subsequent text non-bold.
      */
-    public OurConsole(final Computer computer, boolean syntaxHighlighting, Object... initialMessages) {
+    public OurConsole(final Computer computer, boolean syntaxHighlighting, int fontSize, Object... initialMessages) {
         super(VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        main = do_makeTextPane(false, 5, 5, 5, fontSize);
+        sub = do_makeTextPane(true, 10, 10, 0, fontSize);
+        doSetFontSize(fontSize);
         if (syntaxHighlighting) {
-            sub.setDocument(new OurSyntaxUndoableDocument("Verdana", 14));
+            sub.setDocument(new OurSyntaxUndoableDocument("Verdana", fontSize));
         }
         setViewportView(main);
         // show the initial message
@@ -351,8 +366,8 @@ public final class OurConsole extends JScrollPane {
     /**
      * This helper method constructs a JTextPane with the given settings.
      */
-    private static JTextPane do_makeTextPane(boolean editable, int topMargin, int bottomMargin, int otherMargin) {
-        JTextPane x = OurAntiAlias.pane(null, Color.BLACK, Color.WHITE, new Font("Verdana", Font.PLAIN, 14));
+    private JTextPane do_makeTextPane(boolean editable, int topMargin, int bottomMargin, int otherMargin, int fontSize) {
+        JTextPane x = OurAntiAlias.pane(null, Color.BLACK, Color.WHITE, new Font("Verdana", Font.PLAIN, fontSize));
         x.setEditable(editable);
         x.setAlignmentX(0);
         x.setAlignmentY(0);
